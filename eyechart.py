@@ -27,6 +27,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # Set args manually for testing
+    args.type = 'e_chart'
+    args.single = True
+
     if args.type == 'golovin_sivtsev':
         table = GolovinSivtsev()
     elif args.type == 'golovin_sivtsev_k_alt':
