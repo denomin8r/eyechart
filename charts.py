@@ -149,128 +149,6 @@ class EyeChart:
                 print('File %s saved' % image_name)
 
 
-class GolovinSivtsev(EyeChart):
-
-    def __init__(self, k_alt=False):
-        self.k_alt = k_alt
-
-    @staticmethod
-    def draw_sh(draw, x, y, size):
-        width = size / 5
-        draw.rectangle(((x, y + size), (x + size, y + size - width)), fill='black')
-        draw.rectangle(((x, y + size - width), (x + width, y)), fill='black')
-        draw.rectangle(((x + 2*width, y + size - width), (x + 3*width, y)), fill='black')
-        draw.rectangle(((x + 4*width, y + size - width), (x + size, y)), fill='black')
-    
-    @staticmethod
-    def draw_b(draw, x, y, size):
-        width = size / 5
-        draw.rectangle(((x, y + size), (x + width, y)), fill='black')
-        draw.rectangle(((x, y + width), (x + size, y)), fill='black')
-        draw.ellipse((x + 2*width, y + 2*width, x + size, y + size), fill='black', outline='black')
-        draw.ellipse((x + 3*width, y + 3*width, x + 4*width, y + 4*width), fill = 'white', outline='black')
-        draw.rectangle(((x + width, y + 4*width), (x + 3.5*width, y + 3*width)), fill='white', outline='white')
-        draw.rectangle(((x + width, y + 3*width), (x + 3.5*width, y + 2*width)), fill='black')
-        draw.rectangle(((x + width, y + 5*width), (x + 3.5*width, y + 4*width)), fill='black')
-        
-    @staticmethod
-    def draw_m(draw, x, y, size):
-        width = size / 5
-        draw.rectangle(((x, y), (x + width, y + size)), fill='black')
-        draw.rectangle(((x + 4*width, y), (x + size, y + size)), fill='black')
-        draw.polygon(((x, y), (x + width, y), (x + 3*width, y + size), (x + 2*width, y + size)), fill='black')
-        draw.polygon(((x + 4*width, y), (x + size, y), (x + 3*width, y + size), (x + 2*width, y + size)), fill='black')
-        
-    @staticmethod
-    def draw_n(draw, x, y, size):
-        width = size / 5
-        draw.rectangle(((x, y), (x + width, y + size)), fill='black')
-        draw.rectangle(((x + 4*width, y), (x + size, y + size)), fill='black')
-        draw.rectangle(((x + width, y + 2*width), (x + 4*width, y + 3*width)), fill='black')
-        
-    @staticmethod
-    def draw_k(draw, x, y, size):
-        width = size / 5
-        draw.chord((x - width, y - 3*width, x + size, y + 3*width), 0, 180, fill='black')
-        draw.chord((x, y - 2*width, x + 4*width, y + 2*width), 0, 180, fill='white', outline='white')
-        draw.line(((x - width, y - 1), (x + size, y - 1)), fill='white')
-        draw.rectangle(((x + width, y), (x + 2*width, y + 2*width)), fill='white', outline='white')
-        draw.chord((x - width, y + 2*width, x + size, y + 8*width), 180, 360, fill='black')
-        draw.chord((x, y + 3*width, x + 4*width, y + 7*width), 180, 360, fill='white', outline='white')
-        draw.line(((x - width, y + size), (x + size, y + size)), fill='white')
-        draw.rectangle(((x + width, y + 3*width), (x + 2*width, y + size)), fill='white', outline='white')
-        draw.rectangle(((x - width, y), (x, y + size)), fill='white', outline='white')
-        draw.rectangle(((x, y), (x + width, y + size)), fill='black')
-        draw.rectangle(((x + width, y + 2*width), (x + 3*width, y + 3*width)), fill='black')
-        
-    @staticmethod
-    def draw_k_alt(draw, x, y, size):
-        width = size / 5
-        draw.rectangle(((x, y), (x + width, y + size)), fill='black')
-        draw.rectangle(((x + width, y + 2*width), (x + 3*width, y + 3*width)), fill='black')
-        draw.chord((x + width, y - 3*width, x + size, y + 3*width), 0, 180, fill='black')
-        draw.chord((x + 2*width, y - 2*width, x + 4*width, y + 2*width), 0, 180, fill='white', outline='white')
-        draw.rectangle(((x + width, y), (x + 3*width, y + 2*width)), fill='white', outline='white')
-        draw.line(((x - width, y - 1), (x + size, y - 1)), fill='white')
-        draw.chord((x + width, y + 2*width, x + size, y + 8*width), 180, 360, fill='black')
-        draw.chord((x + 2*width, y + 3*width, x + 4*width, y + 7*width), 180, 360, fill='white', outline='white')
-        draw.rectangle(((x + width, y + 3*width), (x + 3*width, y + size)), fill='white', outline='white')
-        draw.line(((x - width, y + size), (x + size, y + size)), fill='white')
-
-    @staticmethod
-    def draw_y(draw, x, y, size):
-        width = size / 5
-        draw.rectangle(((x, y), (x + width, y + size)), fill='black')
-        draw.rectangle(((x + 4*width, y), (x + size, y + size)), fill='black')
-        draw.ellipse((x + 0.5 * width, y + 2*width, x + 3.5 * width, y + size), fill='black', outline='black')
-        draw.ellipse((x + 1.5 * width, y + 3*width, x + 2.5 * width, y + 4*width), fill='white', outline='black')
-        draw.rectangle(((x + width, y + 2 * width), (x + 2 * width, y + 3 * width)), fill='black')
-        draw.rectangle(((x + width, y + 3 * width), (x + 2 * width, y + 4 * width)), fill='white', outline='white')
-        draw.rectangle(((x + width, y + 4 * width), (x + 2 * width, y + 5 * width)), fill='black')
-        
-    @staticmethod
-    def draw_i(draw, x, y, size):
-        width = size / 5
-        draw.rectangle(((x, y), (x + width, y + size)), fill='black')
-        draw.rectangle(((x + 4*width, y), (x + size, y + size)), fill='black')
-        draw.polygon(((x + width, y + size), (x + 4*width, y + 1.5*width), 
-                      (x + 4*width, y), (x + width, y + 3.5*width)), fill='black')
-
-    def symbol_renderers(self):
-        return [GolovinSivtsev.draw_sh,
-                GolovinSivtsev.draw_b,
-                GolovinSivtsev.draw_m,
-                GolovinSivtsev.draw_n,
-                GolovinSivtsev.draw_k_alt if self.k_alt else GolovinSivtsev.draw_k,
-                GolovinSivtsev.draw_y,
-                GolovinSivtsev.draw_i]
-
-    def standard_symbols(self):
-        # Ш=0, Б=1, М=2, Н=3, К=4, Ы=5, И=6
-        return [0, 1,                           # Ш Б
-                2, 3, 4,                        # М Н К
-                5, 2, 1, 0,                     # Ы М Б Ш
-
-                1, 5, 3, 4, 2,                  # Б Ы Н К М
-                6, 3, 0, 2, 4,                  # И Н Ш М К
-                3, 0, 5, 6, 4, 1,               # Н Ш Ы И К Б
-                0, 6, 3, 1, 4, 5,               # Ш И Н Б К Ы
-                4, 3, 0, 2, 5, 1, 6,            # К Н Ш М Ы Б И
-                1, 4, 0, 2, 6, 5, 3,            # Б К Ш М И Ы Н
-
-                3, 4, 6, 1, 2, 0, 5, 1,         # Н К И Б М Ш Ы Б
-                0, 6, 3, 4, 2, 6, 5, 1,         # Ш И Н К М И Ы Б
-                6, 2, 0, 5, 3, 1, 2, 4,         # И М Ш Ы Н Б М К
-                0, 1, 4, 5, 3, 1, 2, 0, 6, 2,   # Ш Б К Ы Н Б М Ш И М
-                2, 5, 0, 1, 6, 2, 0, 3, 4, 1,   # М Ы Ш Б И М Ш Н К Б
-                6, 1, 5, 3, 2, 1, 6, 3, 0, 4]   # И Б Ы Н М Б И Н Ш К
-
-    def line_lengths(self):
-        return [2, 3, 4,
-                5, 5, 6, 6, 7, 7,
-                8, 8, 8, 10, 10, 10]
-
-
 class LandoltC(EyeChart):
 
     @staticmethod
@@ -330,39 +208,46 @@ class LandoltC(EyeChart):
                 8, 8, 8]
 
 
+def fix_coords(tup1, tup2):
+    x1, y1 = tup1
+    x2, y2 = tup2
+    min_coord = (min(x1, x2), min(y1, y2))
+    max_coord = (max(x1, x2), max(y1, y2))
+    return (min_coord, max_coord)
+
 class EChart(EyeChart):
 
     @staticmethod
     def draw_e(draw, x, y, size):
         width = size / 5
-        draw.rectangle(((x, y), (x + width, y + size)), fill='black')
-        draw.rectangle(((x + width, y), (x + size, y + width)), fill='black')
-        draw.rectangle(((x + width, y + 2*width), (x + size, y + 3*width)), fill='black')
-        draw.rectangle(((x + width, y + 4*width), (x + size, y + size)), fill='black')
+        draw.rectangle(fix_coords((x, y), (x + width, y + size)), fill='black')
+        draw.rectangle(fix_coords((x + width, y), (x + size, y + width)), fill='black')
+        draw.rectangle(fix_coords((x + width, y + 2*width), (x + size, y + 3*width)), fill='black')
+        draw.rectangle(fix_coords((x + width, y + 4*width), (x + size, y + size)), fill='black')
 
     @staticmethod
     def draw_e_turn_cw(draw, x, y, size):
         width = size / 5
-        draw.rectangle(((x, y), (x + size, y + width)), fill='black')
-        draw.rectangle(((x, y + width), (x + width, y + size)), fill='black')
-        draw.rectangle(((x + 2*width, y + width), (x + 3*width, y + size)), fill='black')
-        draw.rectangle(((x + 4*width, y + width), (x + size, y + size)), fill='black')
+        draw.rectangle(fix_coords((x, y), (x + size, y + width)), fill='black')
+        draw.rectangle(fix_coords((x, y + width), (x + width, y + size)), fill='black')
+        draw.rectangle(fix_coords((x + 2*width, y + width), (x + 3*width, y + size)), fill='black')
+        draw.rectangle(fix_coords((x + 4*width, y + width), (x + size, y + size)), fill='black')
 
     @staticmethod
     def draw_e_upside_down(draw, x, y, size):
         width = size / 5
-        draw.rectangle(((x + size - width, y), (x + size, y + size)), fill='black')
-        draw.rectangle(((x, y), (x + size - width, y + width)), fill='black')
-        draw.rectangle(((x, y + 2*width), (x + size - width, y + 3*width)), fill='black')
-        draw.rectangle(((x, y + 4*width), (x + size - width, y + size)), fill='black')
+        draw.rectangle(fix_coords((x + size - width, y), (x + size, y + size)), fill='black')
+        draw.rectangle(fix_coords((x, y), (x + size - width, y + width)), fill='black')
+        draw.rectangle(fix_coords((x, y + 2*width), (x + size - width, y + 3*width)), fill='black')
+        draw.rectangle(fix_coords((x, y + 4*width), (x + size - width, y + size)), fill='black')
 
     @staticmethod
     def draw_e_turn_ccw(draw, x, y, size):
         width = size / 5
-        draw.rectangle(((x, y + size), (x + size, y + size - width)), fill='black')
-        draw.rectangle(((x, y + size - width), (x + width, y)), fill='black')
-        draw.rectangle(((x + 2*width, y + size - width), (x + 3*width, y)), fill='black')
-        draw.rectangle(((x + 4*width, y + size - width), (x + size, y)), fill='black')
+        draw.rectangle(fix_coords((x, y + size), (x + size, y + size - width)), fill='black')
+        draw.rectangle(fix_coords((x, y + size - width), (x + width, y)), fill='black')
+        draw.rectangle(fix_coords((x + 2*width, y + size - width), (x + 3*width, y)), fill='black')
+        draw.rectangle(fix_coords((x + 4*width, y + size - width), (x + size, y)), fill='black')
 
     def symbol_renderers(self):
         return [EChart.draw_e,

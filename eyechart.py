@@ -5,11 +5,9 @@ from charts import GolovinSivtsev, LandoltC, EChart
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--type', default='golovin_sivtsev',
-                        choices=('golovin_sivtsev', 'golovin_sivtsev_k_alt', 'landolt_c', 'e_chart'),
-                        help='Eyechart type: "golovin_sivtsev" for Golovin-Sivtsev table,  "golovin_sivtsev_k_alt" '
-                             'for Golovin-Sivtsev table with altered K letter, "landolt_c" for'
-                             'Landolt C table, or "e_chart" for E-chart')
+    parser.add_argument('-t', '--type', default='e_chart',
+                        choices=('landolt_c', 'e_chart'),
+                        help='Eyechart type: "landolt_c" for Landolt C table, or "e_chart" for E-chart')
     parser.add_argument('-g', '--generator', default='smart_random',
                         choices=('random', 'smart_random', 'standard', 'shifted', 'global_shuffle', 'line_shuffle',
                                  'shifted_line_shuffle'),
@@ -28,14 +26,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Set args manually for testing
-    args.type = 'e_chart'
     args.single = True
 
-    if args.type == 'golovin_sivtsev':
-        table = GolovinSivtsev()
-    elif args.type == 'golovin_sivtsev_k_alt':
-        table = GolovinSivtsev(k_alt=True)
-    elif args.type == 'landolt_c':
+    if args.type == 'landolt_c':
         table = LandoltC()
     elif args.type == 'e_chart':
         table = EChart()
