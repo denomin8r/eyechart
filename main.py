@@ -1,6 +1,6 @@
 import argparse
 
-from charts import EyeChart
+from make_chart import EyeChart
 
 if __name__ == '__main__':
 

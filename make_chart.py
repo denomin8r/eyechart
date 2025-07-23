@@ -36,24 +36,29 @@ class EyeChart:
         :param float x:
         :param float y:
         :param size:
-        :param int degrees
+        :param int degrees:
         :return None:
         """
         x, y = int(x), int(y)
-        font = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), size)
-        draw = ImageDraw.Draw(image_main)
-        left, top, right, bottom = draw.textbbox(xy=(x, 0), font=font, text='D')
-        d_image = Image.new('RGB', (int(right - left), int(bottom - top)), color='white')
-        d_draw = ImageDraw.Draw(d_image)
-        d_draw.text(xy=(0, 0), text="D", font=font, fill='black')
-        d_image.rotate(degrees, expand=1)
-        image_main.paste(d_image, (x, y))
+
+        draw_main = ImageDraw.Draw(image_main)
+
+        font_d = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), size)
+        left, top, right, bottom = draw_main.textbbox(xy=(0, 0), font=font_d, text="D")
+        image_d = Image.new(mode='RGB', size=(int(right - left), int(bottom - top)), color='white')
+        draw_d = ImageDraw.Draw(image_d)
+        draw_d.text(xy=(0, -top), text="D", font=font_d, fill='black')
+
+        image_d.rotate(degrees, expand=1)
+        image_main.paste(image_d, (x, y))
 
     @staticmethod
     def draw_symbol(image: Image.Image, x, y, size, dir_index):
         dir_degrees = (dir_index * 90) % 360
         EyeChart.draw_d_degrees(image, int(x), int(y), size, degrees=dir_degrees)
 
+    # TODO adjust size and x-coords of letters
+    # TODO why arent the D's turning
     @staticmethod
     def x_positions(n, width, height, v):
         size = 7 / v

@@ -6,8 +6,6 @@ a single image file, or three printable at A4 paper images, which can be printed
 office device and stitched together.
 
 The following chart types are implemented:
-* [Golovin-Sivtsev Table](https://en.wikipedia.org/wiki/Golovin%E2%80%93Sivtsev_table) with straight or curved letter K,
-* The [Landolt C](https://en.wikipedia.org/wiki/Landolt_C), also known as a _Landolt ring_, _Landolt broken ring_, or _Japanese vision test_,
 * [E chart](https://en.wikipedia.org/wiki/E_chart), also known as a _tumbling E chart_.
 
 While passing frequently eye acuity test, any eye chart could be memorized, which makes
@@ -26,10 +24,10 @@ Different kinds of shuffling are possible:
 
 To produce eye chart run the following command:
 ```bash
-python eyechart.py -t <type> -g <shuffle>
+python main.py g <shuffle>
 ```
 
 The complete option description can be obtained as follows:
 ```bash
-python eyechart.py -h
+python main.py -h
 ```
