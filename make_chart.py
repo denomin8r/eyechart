@@ -1,9 +1,16 @@
 import numpy as np
 import os
 from PIL import Image, ImageDraw, ImageFont
-from abc import abstractmethod
-
+import logging
 from generator import RandomGenerator, SequenceGenerator
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    handlers=[logging.StreamHandler()],
+)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class EyeChart:
@@ -26,21 +33,17 @@ class EyeChart:
             1.0, 1.5, 2.0, 3.0, 4.0, 5.0,
         ]
 
-
     @staticmethod
-    def draw_d_degrees(image_main: Image.Image, x, y, size, degrees):
+    def draw_d_degrees(image_main, x, y, size, degrees):
         """
 
         :param Image.Image image_main:
-        # TODO try to get these arguments to be ints passed into this fn
-        :param float x:
-        :param float y:
+        :param int x:
+        :param int y:
         :param size:
         :param int degrees:
         :return None:
         """
-        x, y = int(x), int(y)
-
         draw_main = ImageDraw.Draw(image_main)
 
         font_d = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), size)
@@ -49,16 +52,15 @@ class EyeChart:
         draw_d = ImageDraw.Draw(image_d)
         draw_d.text(xy=(0, -top), text="D", font=font_d, fill='black')
 
-        image_d.rotate(degrees, expand=1)
+        image_d = image_d.rotate(angle=degrees, expand=1)
         image_main.paste(image_d, (x, y))
 
     @staticmethod
     def draw_symbol(image: Image.Image, x, y, size, dir_index):
-        dir_degrees = (dir_index * 90) % 360
-        EyeChart.draw_d_degrees(image, int(x), int(y), size, degrees=dir_degrees)
+        degrees = (dir_index * 90) % 360
+        EyeChart.draw_d_degrees(image, int(x), int(y), size, degrees=degrees)
 
     # TODO adjust size and x-coords of letters
-    # TODO why arent the D's turning
     @staticmethod
     def x_positions(n, width, height, v):
         size = 7 / v
