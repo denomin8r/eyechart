@@ -1,6 +1,6 @@
 import argparse
 
-from charts import DChart
+from charts import EyeChart
 
 if __name__ == '__main__':
 
@@ -24,6 +24,6 @@ if __name__ == '__main__':
 
     # Set args manually for testing
     args.single = True
-    table = DChart()
+    table = EyeChart()
 
     table.save(args.generator, args.dots_per_inch, args.filename, args.single)

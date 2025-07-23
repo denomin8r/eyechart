@@ -15,16 +15,7 @@ class EyeChart:
     V_OFFSET_MM_RIGHT = 40
     D_OFFSET_MM_LEFT = 30
 
-    @abstractmethod
-    def symbol_renderers(self):
-        pass
-
-    @abstractmethod
-    def standard_symbols(self):
-        pass
-
-    @abstractmethod
-    def line_lengths(self):
+    def __init__(self):
         pass
 
     @staticmethod
@@ -35,9 +26,33 @@ class EyeChart:
             1.0, 1.5, 2.0, 3.0, 4.0, 5.0,
         ]
 
-    def draw_symbol(self, image: Image.Image, x:int, y:int, size, symbol):
 
-        self.symbol_renderers()[symbol](image, x, y, size)
+    @staticmethod
+    def draw_d_degrees(image_main: Image.Image, x, y, size, degrees):
+        """
+
+        :param Image.Image image_main:
+        # TODO try to get these arguments to be ints passed into this fn
+        :param float x:
+        :param float y:
+        :param size:
+        :param int degrees
+        :return None:
+        """
+        x, y = int(x), int(y)
+        font = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), size)
+        draw = ImageDraw.Draw(image_main)
+        left, top, right, bottom = draw.textbbox(xy=(x, 0), font=font, text='D')
+        d_image = Image.new('RGB', (int(right - left), int(bottom - top)), color='white')
+        d_draw = ImageDraw.Draw(d_image)
+        d_draw.text(xy=(0, 0), text="D", font=font, fill='black')
+        d_image.rotate(degrees, expand=1)
+        image_main.paste(d_image, (x, y))
+
+    @staticmethod
+    def draw_symbol(image: Image.Image, x, y, size, dir_index):
+        dir_degrees = (dir_index * 90) % 360
+        EyeChart.draw_d_degrees(image, int(x), int(y), size, degrees=dir_degrees)
 
     @staticmethod
     def x_positions(n, width, height, v):
@@ -68,9 +83,9 @@ class EyeChart:
             global_shift = np.random.randint(0, len(self.standard_symbols()), 1)[0]
             return SequenceGenerator(sequence=self.standard_symbols(), global_shift=global_shift, shuffle='line')
         elif 'random' == generator_name:
-            return RandomGenerator(n_symbols=len(self.symbol_renderers()))
+            return RandomGenerator(n_symbols=4)
         elif 'smart_random' == generator_name:
-            return RandomGenerator(n_symbols=len(self.symbol_renderers()), smart=True)
+            return RandomGenerator(n_symbols=4, smart=True)
         else:
             raise NotImplementedError(generator_name)
 
@@ -164,75 +179,28 @@ class EyeChart:
                 EyeChart.save_image(image, image_name)
                 print('File %s saved' % image_name)
 
-
-def fix_coords(tup1, tup2):
-    x1, y1 = tup1
-    x2, y2 = tup2
-    min_coord = (min(x1, x2), min(y1, y2))
-    max_coord = (max(x1, x2), max(y1, y2))
-    return min_coord, max_coord
-
-
-class DChart(EyeChart):
-
-    @staticmethod
-    def draw_d(image:Image.Image, x, y, size):
-        font = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), size)
-        draw = ImageDraw.Draw(image)
-        draw.text(xy=(x, y), text="D", fill='black', font=font)
-
-    @staticmethod
-    def draw_d_turn_cw(image_main:Image.Image, x, y, size):
-        x, y = int(x), int(y)
-        font = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), size)
-        draw = ImageDraw.Draw(image_main)
-        left, top, right, bottom = draw.textbbox(xy=(x, 0), font=font, text='D')
-        d_image = Image.new('RGB', (int(right - left), int(bottom - top)), color='white')
-        d_draw = ImageDraw.Draw(d_image)
-        d_draw.text(xy=(0,0), text="D", font=font, fill='black')
-        d_image.rotate(90, expand=1)
-        image_main.paste(d_image, (x, y))
-
-    @staticmethod
-    def draw_d_upside_down(draw, x, y, size):
-        width = size / 5
-        draw.rectangle(fix_coords((x + size - width, y), (x + size, y + size)), fill='black')
-        draw.rectangle(fix_coords((x, y), (x + size - width, y + width)), fill='black')
-        draw.rectangle(fix_coords((x, y + 2 * width), (x + size - width, y + 3 * width)), fill='black')
-        draw.rectangle(fix_coords((x, y + 4 * width), (x + size - width, y + size)), fill='black')
-
-    @staticmethod
-    def draw_d_turn_ccw(draw, x, y, size):
-        width = size / 5
-        draw.rectangle(fix_coords((x, y + size), (x + size, y + size - width)), fill='black')
-        draw.rectangle(fix_coords((x, y + size - width), (x + width, y)), fill='black')
-        draw.rectangle(fix_coords((x + 2 * width, y + size - width), (x + 3 * width, y)), fill='black')
-        draw.rectangle(fix_coords((x + 4 * width, y + size - width), (x + size, y)), fill='black')
-
-    def symbol_renderers(self):
-        return [DChart.draw_d,
-                DChart.draw_d_turn_cw,
-                DChart.draw_d_turn_ccw,
-                DChart.draw_d_upside_down]
-
-    def standard_symbols(self):
+    @ staticmethod
+    def standard_symbols():
         # Е=0, М=1, Э=2, Ш=3
-        return [0, 3,                       # Е Ш
-                2, 1, 0,                    # Э М Е
-                1, 3, 0, 2,                 # М Ш Е Э
+        return [
+            0, 3,  # Е Ш
+            2, 1, 0,  # Э М Е
+            1, 3, 0, 2,  # М Ш Е Э
 
-                3, 2, 0, 1, 3,              # Ш Э Е М Ш
-                2, 1, 0, 2, 1, 0,           # Э М Е Э М Е
-                1, 3, 2, 3, 1, 3,           # М Ш Э Ш М Ш
-                2, 0, 1, 3, 1, 0, 2,        # Э Е М Ш М Е Э
-                3, 0, 3, 1, 0, 2, 3,        # Ш Е Ш М Е Э Ш
-                1, 3, 2, 0, 2, 3, 0,        # М Ш Э Е Э Ш Е
+            3, 2, 0, 1, 3,  # Ш Э Е М Ш
+            2, 1, 0, 2, 1, 0,  # Э М Е Э М Е
+            1, 3, 2, 3, 1, 3,  # М Ш Э Ш М Ш
+            2, 0, 1, 3, 1, 0, 2,  # Э Е М Ш М Е Э
+            3, 0, 3, 1, 0, 2, 3,  # Ш Е Ш М Е Э Ш
+            1, 3, 2, 0, 2, 3, 0,  # М Ш Э Е Э Ш Е
 
-                0, 1, 0, 2, 3, 1, 0, 2,     # Е М Е Э Ш М Е Э
-                2, 1, 0, 2, 1, 0, 3, 1,     # Э М Е Э М Е Ш М
-                1, 3, 2, 1, 3, 2, 0, 3]     # М Ш Э М Ш Э Е Ш
+            0, 1, 0, 2, 3, 1, 0, 2,  # Е М Е Э Ш М Е Э
+            2, 1, 0, 2, 1, 0, 3, 1,  # Э М Е Э М Е Ш М
+            1, 3, 2, 1, 3, 2, 0, 3   # М Ш Э М Ш Э Е Ш
+        ]
 
-    def line_lengths(self):
+    @staticmethod
+    def line_lengths():
         return [2, 3, 4,
                 5, 6, 6, 7, 7, 7,
                 8, 8, 8]
