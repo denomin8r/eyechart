@@ -1,13 +1,10 @@
 import argparse
 
-from charts import GolovinSivtsev, LandoltC, EChart
+from charts import DChart
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--type', default='e_chart',
-                        choices=('landolt_c', 'e_chart'),
-                        help='Eyechart type: "landolt_c" for Landolt C table, or "e_chart" for E-chart')
     parser.add_argument('-g', '--generator', default='smart_random',
                         choices=('random', 'smart_random', 'standard', 'shifted', 'global_shuffle', 'line_shuffle',
                                  'shifted_line_shuffle'),
@@ -27,12 +24,6 @@ if __name__ == '__main__':
 
     # Set args manually for testing
     args.single = True
-
-    if args.type == 'landolt_c':
-        table = LandoltC()
-    elif args.type == 'e_chart':
-        table = EChart()
-    else:
-        raise NotImplementedError(args.type)
+    table = DChart()
 
     table.save(args.generator, args.dots_per_inch, args.filename, args.single)
