@@ -23,22 +23,3 @@ class RandomGenerator:
                 symbols += new_symbols
             
         return symbols[:n]
-
-
-class SequenceGenerator:
-    
-    def __init__(self, sequence, global_shift=0, shuffle=None):
-        
-        self.sequence = sequence[global_shift:] + sequence[:global_shift]
-        if 'global' == shuffle:
-            np.random.shuffle(self.sequence)
-        self.shuffle_line = 'line' == shuffle
-        
-        self.shift = 0
-
-    def next_symbols(self, n):
-        symbols = self.sequence[self.shift:self.shift+n]
-        if self.shuffle_line:
-            np.random.shuffle(symbols)
-        self.shift += n
-        return symbols

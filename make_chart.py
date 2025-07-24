@@ -1,8 +1,8 @@
-import numpy as np
 import os
 from PIL import Image, ImageDraw, ImageFont
 import logging
-from generator import RandomGenerator, SequenceGenerator
+from generator import RandomGenerator
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -70,32 +70,6 @@ class EyeChart:
             for k in range(n)
         ], size / EyeChart.A4_HEIGHT_MM * height
 
-    def symbol_generator(self, generator_name):
-        """
-        Returns a Generator that yields successive symbols to print to the eyechar.
-
-        :param str generator_name:
-        :return:
-        """
-        if 'standard' == generator_name:
-            return SequenceGenerator(sequence=self.standard_symbols())
-        elif 'shifted' == generator_name:
-            global_shift = np.random.randint(0, len(self.standard_symbols()), 1)[0]
-            return SequenceGenerator(sequence=self.standard_symbols(), global_shift=global_shift)
-        elif 'global_shuffle' == generator_name:
-            return SequenceGenerator(sequence=self.standard_symbols(), shuffle='global')
-        elif 'line_shuffle' == generator_name:
-            return SequenceGenerator(sequence=self.standard_symbols(), shuffle='line')
-        elif 'shifted_line_shuffle' == generator_name:
-            global_shift = np.random.randint(0, len(self.standard_symbols()), 1)[0]
-            return SequenceGenerator(sequence=self.standard_symbols(), global_shift=global_shift, shuffle='line')
-        elif 'random' == generator_name:
-            return RandomGenerator(n_symbols=4)
-        elif 'smart_random' == generator_name:
-            return RandomGenerator(n_symbols=4, smart=True)
-        else:
-            raise NotImplementedError(generator_name)
-
     def draw_sheet(self, width, height, offsets, ns, vs, generator):
 
         image = Image.new('RGB', (width, height), color='white')
@@ -161,9 +135,9 @@ class EyeChart:
                 os.makedirs(head)
         image.save(filename)
 
-    def save(self, generator_name, dpi=600, filename='sheet.png', single=False):
+    def save(self, dpi=600, filename='sheet.png', single=False):
 
-        generator = self.symbol_generator(generator_name)
+        generator = RandomGenerator(n_symbols=4, smart=True)
 
         width = int(EyeChart.A4_WIDTH_MM * dpi / EyeChart.MM_PER_INCH)
         height = int(EyeChart.A4_HEIGHT_MM * dpi / EyeChart.MM_PER_INCH)
