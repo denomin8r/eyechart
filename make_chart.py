@@ -26,14 +26,6 @@ class EyeChart:
         pass
 
     @staticmethod
-    def v_values():
-        return [
-            0.1, 0.2, 0.3,
-            0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
-            1.0, 1.5, 2.0, 3.0, 4.0, 5.0,
-        ]
-
-    @staticmethod
     def draw_d_degrees(image_main, x, y, size, degrees):
         """
 
@@ -70,63 +62,6 @@ class EyeChart:
             for k in range(n)
         ], size / EyeChart.A4_HEIGHT_MM * height
 
-    def draw_sheet(self, width, height, offsets, ns, vs, generator):
-
-        image = Image.new('RGB', (width, height), color='white')
-        draw = ImageDraw.Draw(image)
-
-        fontsize = int(4.2 / EyeChart.A4_HEIGHT_MM * height)
-
-        # https://stackoverflow.com/questions/43060479/how-to-get-the-font-pixel-height-using-pil-imagefont
-        font = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), fontsize)
-        ascent, descent = font.getmetrics()
-
-        y_coord = 0
-        for offset, n, v in zip(offsets, ns, vs):
-            y_coord += offset / EyeChart.A4_HEIGHT_MM * height
-            x_coords, size = EyeChart.x_positions(n, width, height, v)
-            symbols = generator.next_symbols(n)
-            for x, symbol in zip(x_coords, symbols):
-                self.draw_symbol(image, x, y_coord, size, symbol)
-
-            if symbols:
-                d_text = ('D = %.1f' % (5.0 / v)).replace('.', ',')
-                v_text = ('V = %.1f' % v).replace('.', ',')
-                _, (_, d_offset_y) = font.font.getsize(d_text)
-                _, (_, v_offset_y) = font.font.getsize(v_text)
-                draw.text((EyeChart.D_OFFSET_MM_LEFT / EyeChart.A4_WIDTH_MM * width,
-                           y_coord + size / 2 - (ascent - d_offset_y) / 2), d_text, (0, 0, 0), font=font)
-                draw.text(((EyeChart.A4_WIDTH_MM - EyeChart.V_OFFSET_MM_RIGHT) / EyeChart.A4_WIDTH_MM * width,
-                           y_coord + size / 2 - (ascent - v_offset_y) / 2), v_text, (0, 0, 0), font=font)
-
-            y_coord += size
-
-        return image
-
-    def draw_sheet_1(self, width, height, generator):
-        return self.draw_sheet(width=width, height=height, offsets=[20, 23, 23],
-                               ns=self.line_lengths()[:3], vs=self.v_values()[:3], generator=generator)
-
-    def draw_sheet_2(self, width, height, generator):
-        return self.draw_sheet(width, height, [14, 23, 23, 23, 23, 23],
-                               self.line_lengths()[3:9], vs=self.v_values()[3:9], generator=generator)
-
-    def draw_sheet_3(self, width, height, generator):
-        lengths = self.line_lengths()[9:]
-        image = self.draw_sheet(width, height, [13, 23, 23, 36, 23, 23][:len(lengths)],
-                                ns=lengths, vs=self.v_values()[:len(lengths)], generator=generator)
-
-        draw = ImageDraw.Draw(image)
-        draw.rectangle(((1. / EyeChart.A4_WIDTH_MM * width, 28. / EyeChart.A4_HEIGHT_MM * height),
-                        ((EyeChart.A4_WIDTH_MM - 6.) / EyeChart.A4_WIDTH_MM * width,
-                         28.7 / EyeChart.A4_HEIGHT_MM * height)),
-                       fill='black')
-        draw.line(((1. / EyeChart.A4_WIDTH_MM * width, 98. / EyeChart.A4_HEIGHT_MM * height),
-                   ((EyeChart.A4_WIDTH_MM - 6.) / EyeChart.A4_WIDTH_MM * width, 98. / EyeChart.A4_HEIGHT_MM * height)),
-                  fill='black')
-
-        return image
-
     @staticmethod
     def save_image(image, filename):
         head, tail = os.path.split(filename)
@@ -160,6 +95,82 @@ class EyeChart:
                 EyeChart.save_image(image, image_name)
                 print('File %s saved' % image_name)
 
+
+    def draw_sheet(self, width, height, offsets, num_symbols_per_line, v_values_per_line, generator):
+
+        image = Image.new('RGB', (width, height), color='white')
+        draw = ImageDraw.Draw(image)
+
+        fontsize = int(4.2 / EyeChart.A4_HEIGHT_MM * height)
+
+        # https://stackoverflow.com/questions/43060479/how-to-get-the-font-pixel-height-using-pil-imagefont
+        font = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), fontsize)
+        ascent, descent = font.getmetrics()
+
+        y_coord = 0
+        for offset, num_symbols, v_value in zip(offsets, num_symbols_per_line, v_values_per_line):
+            y_coord += offset / EyeChart.A4_HEIGHT_MM * height
+            x_coords, size = EyeChart.x_positions(num_symbols, width, height, v_value)
+            line_symbols = generator.next_symbols(num_symbols)
+
+            for x, symbol in zip(x_coords, line_symbols):
+                self.draw_symbol(image, x, y_coord, size, symbol)
+
+            d_text = ('D = %.1f' % (5.0 / v_value)).replace('.', ',')
+            v_text = ('V = %.1f' % v_value).replace('.', ',')
+            _, (_, d_offset_y) = font.font.getsize(d_text)
+            _, (_, v_offset_y) = font.font.getsize(v_text)
+            draw.text((EyeChart.D_OFFSET_MM_LEFT / EyeChart.A4_WIDTH_MM * width,
+                       y_coord + size / 2 - (ascent - d_offset_y) / 2), d_text, (0, 0, 0), font=font)
+            draw.text(((EyeChart.A4_WIDTH_MM - EyeChart.V_OFFSET_MM_RIGHT) / EyeChart.A4_WIDTH_MM * width,
+                       y_coord + size / 2 - (ascent - v_offset_y) / 2), v_text, (0, 0, 0), font=font)
+
+            y_coord += size
+
+        return image
+
+    def draw_sheet_1(self, width, height, generator):
+        return self.draw_sheet(width=width, height=height,
+                               offsets=self.offsets()[:3],
+                               num_symbols_per_line=self.line_lengths()[:3],
+                               v_values_per_line=self.v_values()[:3],
+                               generator=generator)
+
+    def draw_sheet_2(self, width, height, generator):
+        return self.draw_sheet(width, height,
+                               offsets=self.offsets()[3:9],
+                               num_symbols_per_line=self.line_lengths()[3:9],
+                               v_values_per_line=self.v_values()[3:9],
+                               generator=generator)
+
+    def draw_sheet_3(self, width, height, generator):
+        lengths = self.line_lengths()[9:]
+        image = self.draw_sheet(width, height,
+                                offsets=self.offsets()[:len(lengths)],
+                                num_symbols_per_line=lengths,
+                                v_values_per_line=self.v_values()[:len(lengths)],
+                                generator=generator)
+
+        draw = ImageDraw.Draw(image)
+        draw.rectangle(((1. / EyeChart.A4_WIDTH_MM * width, 28. / EyeChart.A4_HEIGHT_MM * height),
+                        ((EyeChart.A4_WIDTH_MM - 6.) / EyeChart.A4_WIDTH_MM * width,
+                         28.7 / EyeChart.A4_HEIGHT_MM * height)),
+                       fill='black')
+        draw.line(((1. / EyeChart.A4_WIDTH_MM * width, 98. / EyeChart.A4_HEIGHT_MM * height),
+                   ((EyeChart.A4_WIDTH_MM - 6.) / EyeChart.A4_WIDTH_MM * width, 98. / EyeChart.A4_HEIGHT_MM * height)),
+                  fill='black')
+
+        return image
+
+    # TODO what kind of offsets? Horizontal? Vertical?
+    @staticmethod
+    def offsets():
+        return [
+            20, 23, 23,
+            14, 23, 23, 23, 23, 23,
+            13, 23, 23, 36, 23, 23,
+        ]
+
     @ staticmethod
     def standard_symbols():
         # Е=0, М=1, Э=2, Ш=3
@@ -178,6 +189,14 @@ class EyeChart:
             0, 1, 0, 2, 3, 1, 0, 2,  # Е М Е Э Ш М Е Э
             2, 1, 0, 2, 1, 0, 3, 1,  # Э М Е Э М Е Ш М
             1, 3, 2, 1, 3, 2, 0, 3   # М Ш Э М Ш Э Е Ш
+        ]
+
+    @staticmethod
+    def v_values():
+        return [
+            0.1, 0.2, 0.3,
+            0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
+            1.0, 1.5, 2.0, 3.0, 4.0, 5.0,
         ]
 
     @staticmethod
