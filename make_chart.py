@@ -13,22 +13,26 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-INCREMENTAL_Y_OFFSETS = [
-    20, 23, 23,
-    14, 23, 23, 23, 23, 23,
-]
+class EyeChart:
 
-
-V_VALUES = [
-    0.1, 0.2, 0.3,
-    0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
-]
-
-
-LINE_LENGTHS = [
-    2, 3, 4,
-    5, 6, 6, 7, 7, 7,
-]
+    A4_WIDTH_MM = 297
+    A4_HEIGHT_MM = 209
+    MM_PER_INCH = 25.4
+    TABLE_WIDTH = 173
+    V_OFFSET_MM_RIGHT = 40
+    D_OFFSET_MM_LEFT = 30
+    INCREMENTAL_Y_OFFSETS = [
+        20, 23, 23,
+        14, 23, 23, 23, 23, 23,
+    ]
+    V_VALUES = [
+        0.1, 0.2, 0.3,
+        0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
+    ]
+    LINE_LENGTHS = [
+        2, 3, 4,
+        5, 6, 6, 7, 7, 7,
+    ]
 
 
 def expand2square(image:Image.Image) -> Image.Image:
@@ -83,16 +87,16 @@ def draw_sheet(im_width, im_height, y_offsets, num_symbols_per_line, v_values_pe
     ascent, descent = font.getmetrics()
 
     y_coord = 0
-    for y_offset, num_symbols, v_value in zip(y_offsets, num_symbols_per_line, v_values_per_line):
-        y_coord += y_offset / EyeChart.A4_HEIGHT_MM * im_height
-        x_coords, size = EyeChart.x_positions(num_symbols, im_width, im_height, v_value)
+    for line_y_offset, num_symbols, line_v_value in zip(y_offsets, num_symbols_per_line, v_values_per_line):
+        y_coord += line_y_offset / EyeChart.A4_HEIGHT_MM * im_height
+        x_coords, size = x_positions(num_symbols, im_width, im_height, line_v_value)
         line_symbols = generator.next_symbols(num_symbols)
 
-        for x, symbol in zip(x_coords, line_symbols):
-            draw_symbol(image, x, y_coord, size, symbol)
+        for x_coord, symbol in zip(x_coords, line_symbols):
+            draw_symbol(image, x_coord, y_coord, size, symbol)
 
-        d_text = ('D = %.1f' % (5.0 / v_value)).replace('.', ',')
-        v_text = ('V = %.1f' % v_value).replace('.', ',')
+        d_text = ('D = %.1f' % (5.0 / line_v_value)).replace('.', ',')
+        v_text = ('V = %.1f' % line_v_value).replace('.', ',')
         _, (_, d_offset_y) = font.font.getsize(d_text)
         _, (_, v_offset_y) = font.font.getsize(v_text)
         draw.text((EyeChart.D_OFFSET_MM_LEFT / EyeChart.A4_WIDTH_MM * im_width,
@@ -107,53 +111,43 @@ def draw_sheet(im_width, im_height, y_offsets, num_symbols_per_line, v_values_pe
 
 def draw_sheet_1(width, height, generator):
     return draw_sheet(im_width=width, im_height=height,
-                      y_offsets=INCREMENTAL_Y_OFFSETS[:3],
-                      num_symbols_per_line=LINE_LENGTHS[:3],
-                      v_values_per_line=V_VALUES[:3],
+                      y_offsets=EyeChart.INCREMENTAL_Y_OFFSETS[:3],
+                      num_symbols_per_line=EyeChart.LINE_LENGTHS[:3],
+                      v_values_per_line=EyeChart.V_VALUES[:3],
                       generator=generator)
 
 def draw_sheet_2(width, height, generator):
     return draw_sheet(width, height,
-                      y_offsets=INCREMENTAL_Y_OFFSETS[3:9],
-                      num_symbols_per_line=LINE_LENGTHS[3:9],
-                      v_values_per_line=V_VALUES[3:9],
+                      y_offsets=EyeChart.INCREMENTAL_Y_OFFSETS[3:9],
+                      num_symbols_per_line=EyeChart.LINE_LENGTHS[3:9],
+                      v_values_per_line=EyeChart.V_VALUES[3:9],
                       generator=generator)
 
 
 def save(dpi=600, filename='sheet.png'):
 
-    generator = RandomGenerator(n_symbols=4, smart=True)
+    symbol_generator = RandomGenerator(n_symbols=4)
 
     width = int(EyeChart.A4_WIDTH_MM * dpi / EyeChart.MM_PER_INCH)
     height = int(EyeChart.A4_HEIGHT_MM * dpi / EyeChart.MM_PER_INCH)
 
     # Printing on a single page
-    result = Image.new('RGB', (width, 3 * height))
+    result = Image.new('RGB', (width, 2 * height))
     for i, method in enumerate([draw_sheet_1, draw_sheet_2]):
-        image = method(width, height, generator)
+        image = method(width, height, symbol_generator)
         result.paste(im=image, box=(0, i * height))
     save_image(result, filename)
     print('File %s saved' % filename)
 
 
-class EyeChart:
-
-    A4_WIDTH_MM = 297
-    A4_HEIGHT_MM = 209
-    MM_PER_INCH = 25.4
-    TABLE_WIDTH = 173
-    V_OFFSET_MM_RIGHT = 40
-    D_OFFSET_MM_LEFT = 30
-
-    @staticmethod
-    def x_positions(num_symbols, width, height, v):
-        """
-        :return:    x-coordinates, size
-        """
-        fontsize_multiplier = 1.7
-        size = 7 / v
-        space = (EyeChart.TABLE_WIDTH - num_symbols * size) / (num_symbols - 1)
-        return [
-            (((EyeChart.A4_WIDTH_MM - EyeChart.TABLE_WIDTH) / 2 + (size + space) * k) / EyeChart.A4_WIDTH_MM * width)
-            for k in range(num_symbols)
-        ], size / EyeChart.A4_HEIGHT_MM * height * fontsize_multiplier
+def x_positions(num_symbols, width, height, v):
+    """
+    :return:    x-coordinates, size
+    """
+    fontsize_multiplier = 1.7
+    size = 7 / v
+    space = (EyeChart.TABLE_WIDTH - num_symbols * size) / (num_symbols - 1)
+    return [
+        (((EyeChart.A4_WIDTH_MM - EyeChart.TABLE_WIDTH) / 2 + (size + space) * k) / EyeChart.A4_WIDTH_MM * width)
+        for k in range(num_symbols)
+    ], size / EyeChart.A4_HEIGHT_MM * height * fontsize_multiplier

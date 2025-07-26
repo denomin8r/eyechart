@@ -16,6 +16,6 @@ if __name__ == '__main__':
 
     save(args.dots_per_inch, args.filename)
 
-# TODO Tweak v_values, y_offsets, size, and x-position calculation to produce a nice chart. make it more dynamic
-# TODO adjust size of canvas"
 # TODO add big D on top line
+# TODO Tweak v_values, y_offsets, size, and x-position calculation to produce a nice chart. make it more dynamic
+# TODO the Ds should shrink more and I can squeeze a few more in
