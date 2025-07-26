@@ -16,6 +16,8 @@ if __name__ == '__main__':
 
     save(args.dots_per_inch, args.filename)
 
-# TODO add big D on top line
+
+# TODO fix how the size is set for symbol images... something to do with fontsize or size
 # TODO Tweak v_values, y_offsets, size, and x-position calculation to produce a nice chart. make it more dynamic
-# TODO the Ds should shrink more and I can squeeze a few more in
+# TODO the symbols should shrink more and I can squeeze a few more in
+# TODO add this project to denomin8r
