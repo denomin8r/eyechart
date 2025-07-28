@@ -16,7 +16,5 @@ if __name__ == '__main__':
     save(args.filename)
 
 
-# TODO make the y_offset a standard value? Or relative to the symbol size?
-# TODO Tweak v_values, y_offsets, size, and x-position calculation to produce a nice chart. make it more dynamic
-# TODO the symbols should shrink more and I can squeeze a few more in
-# TODO add this project to denomin8r
+# TODO Make shrinking of symbols per line more geometric
+# TODO ^ This will allow me to eliminate V_VALUES_PER_LINE as a list and just make it a formula

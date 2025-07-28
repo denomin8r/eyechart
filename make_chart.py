@@ -25,20 +25,13 @@ class EyeChart:
     TABLE_WIDTH_DOTS = TABLE_WIDTH_MM * DPMM
     TABLE_START_MM = (CANVAS_WIDTH_MM - TABLE_WIDTH_MM) / 2
     TABLE_START_DOTS = TABLE_START_MM * DPMM
-    V_OFFSET_RIGHT_MM = 40
-    D_OFFSET_LEFT_MM = 30
-    INCREMENTAL_Y_OFFSETS = [
-        20, 20, 23, 23,
-        14, 23, 23, 23, 23, 23,
-    ]
+    V_OFFSET_RIGHT_MM = 38
+    D_OFFSET_LEFT_MM = 24
     V_VALUES = [
         0.075, 0.1, 0.2, 0.3,
-        0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
+        0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4 ,1.5
     ]
-    LINE_LENGTHS = [
-        1, 2, 3, 4,
-        5, 6, 6, 7, 7, 7,
-    ]
+    NUM_LINES = 16
 
 
 def expand2square(image:Image.Image) -> Image.Image:
@@ -96,11 +89,10 @@ def draw_symbols_to_image(image, im_width_dots, im_height_dots, symbol_generator
     ascent, descent = font.getmetrics()
 
     y = 0
-    for line_y_offset, num_symbols, line_v_value in zip(
-            EyeChart.INCREMENTAL_Y_OFFSETS,
-            EyeChart.LINE_LENGTHS,
-            EyeChart.V_VALUES):
+    for n in range(EyeChart.NUM_LINES):
         # Get y coordinate for symbols in this line
+        line_v_value = EyeChart.V_VALUES[n]
+        line_y_offset = 10
         y += line_y_offset / EyeChart.CANVAS_HEIGHT_MM * im_height_dots
 
         # Get the size of the symbols we are adding to this line
@@ -108,14 +100,14 @@ def draw_symbols_to_image(image, im_width_dots, im_height_dots, symbol_generator
         font_obj = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), symbol_size)
 
         # Make the symbols
-        symbol_indices = symbol_generator.next_symbols(num_symbols)
+        symbol_indices = symbol_generator.next_symbols(n+1)
         symbols = []
         for i in symbol_indices:
             symbols.append(draw_symbol_d_degrees(image, font_obj, i))
 
         symbol_w, symbol_h = symbols[0].size
 
-        x_coords = x_positions(num_symbols, symbol_w)
+        x_coords = x_positions(n+1, symbol_w)
         for x, sym in zip(x_coords, symbols):
             image.paste(sym, (int(x), int(y)))
 
