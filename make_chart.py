@@ -1,3 +1,4 @@
+import math
 import os
 from PIL import Image, ImageDraw, ImageFont
 import logging
@@ -17,9 +18,9 @@ DPI = 600
 DPMM = 1 / MM_PER_INCH * DPI
 CHAR = "D"
 
+
 class EyeChart:
     CANVAS_WIDTH_MM = 297
-    CANVAS_WIDTH_DOTS = CANVAS_WIDTH_MM * DPMM
     CANVAS_HEIGHT_MM = 418
     TABLE_WIDTH_MM = 173
     TABLE_WIDTH_DOTS = TABLE_WIDTH_MM * DPMM
@@ -28,8 +29,8 @@ class EyeChart:
     V_OFFSET_RIGHT_MM = 38
     D_OFFSET_LEFT_MM = 24
     V_VALUES = [
-        0.075, 0.1, 0.2, 0.3,
-        0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4 ,1.5
+        0.066, 0.1, 0.15, 0.2, 0.3,
+        0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5
     ]
     NUM_LINES = 16
 
@@ -82,21 +83,23 @@ def x_positions(num_symbols, symbol_w_dots) -> list:
 
 def draw_symbols_to_image(image, im_width_dots, im_height_dots, symbol_generator):
     draw = ImageDraw.Draw(image)
-    fontsize = int(4.2 / EyeChart.CANVAS_HEIGHT_MM * im_height_dots)
+    fontsize = int(0.01 * im_height_dots)
 
     # https://stackoverflow.com/questions/43060479/how-to-get-the-font-pixel-height-using-pil-imagefont
     font = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), fontsize)
     ascent, descent = font.getmetrics()
 
     y = 0
+    last = math.inf
     for n in range(EyeChart.NUM_LINES):
         # Get y coordinate for symbols in this line
-        line_v_value = EyeChart.V_VALUES[n]
-        line_y_offset = 10
-        y += line_y_offset / EyeChart.CANVAS_HEIGHT_MM * im_height_dots
+        v_value = EyeChart.V_VALUES[n]
+        y += (10 / EyeChart.CANVAS_HEIGHT_MM) * im_height_dots
 
         # Get the size of the symbols we are adding to this line
-        symbol_size = 7 / line_v_value / EyeChart.CANVAS_HEIGHT_MM * im_height_dots
+        symbol_size = ((7 / EyeChart.CANVAS_HEIGHT_MM) * im_height_dots) / v_value
+        logger.debug(f"{v_value=}, {symbol_size=}, {symbol_size / last}")
+        last = symbol_size
         font_obj = ImageFont.truetype(os.path.join('fonts', 'bookman.ttf'), symbol_size)
 
         # Make the symbols
@@ -111,17 +114,15 @@ def draw_symbols_to_image(image, im_width_dots, im_height_dots, symbol_generator
         for x, sym in zip(x_coords, symbols):
             image.paste(sym, (int(x), int(y)))
 
-        # TODO refactor all the rest to place D and V text
-        d_text = ('D = %.1f' % (5.0 / line_v_value)).replace('.', ',')
-        v_text = ('V = %.1f' % line_v_value).replace('.', ',')
+        d_text = ('D = %.1f' % (5.0 / v_value)).replace('.', ',')
+        v_text = ('V = %.2f' % v_value).replace('.', ',')
         _, (_, d_offset_y) = font.font.getsize(d_text)
         _, (_, v_offset_y) = font.font.getsize(v_text)
-        draw.text((EyeChart.D_OFFSET_LEFT_MM / EyeChart.CANVAS_WIDTH_MM * im_width_dots,
+        draw.text(((EyeChart.D_OFFSET_LEFT_MM / EyeChart.CANVAS_WIDTH_MM) * im_width_dots,
                    y + symbol_size / 2 - (ascent - d_offset_y) / 2), d_text, (0, 0, 0), font=font)
         draw.text(((EyeChart.CANVAS_WIDTH_MM - EyeChart.V_OFFSET_RIGHT_MM) / EyeChart.CANVAS_WIDTH_MM * im_width_dots,
                    y + symbol_size / 2 - (ascent - v_offset_y) / 2), v_text, (0, 0, 0), font=font)
 
-        # TODO change how y_coord is adjusted
         y += symbol_h
 
     return image

@@ -14,7 +14,3 @@ if __name__ == '__main__':
     args.single = True
 
     save(args.filename)
-
-
-# TODO Make shrinking of symbols per line more geometric
-# TODO ^ This will allow me to eliminate V_VALUES_PER_LINE as a list and just make it a formula
