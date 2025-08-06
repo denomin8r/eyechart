@@ -11,6 +11,5 @@ if __name__ == '__main__':
                              'Image compression is defined by extension, which is mandatory')
 
     args = parser.parse_args()
-    args.single = True
 
     save(args.filename)

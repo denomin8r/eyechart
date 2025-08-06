@@ -1,9 +1,9 @@
 import math
 import os
+
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import logging
-from generator import RandomGenerator
-
 
 logging.basicConfig(
     level=logging.INFO,
@@ -17,6 +17,16 @@ MM_PER_INCH = 25.4
 DPI = 600
 DPMM = 1 / MM_PER_INCH * DPI
 CHAR = "D"
+
+
+class RandomGenerator:
+
+    def __init__(self, n_symbols):
+
+        self.n_symbols = n_symbols
+
+    def next_symbols(self, num_symbols):
+        return np.random.randint(0, self.n_symbols, num_symbols)
 
 
 class EyeChart:
